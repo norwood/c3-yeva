@@ -1,7 +1,7 @@
 version: "2"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:3.2.0
+    image: confluentinc/cp-zookeeper:3.3.0
     restart: always
     environment:
       ZOOKEEPER_SERVER_ID: 1
@@ -9,7 +9,7 @@ services:
       ZOOKEEPER_TICK_TIME: "2000"
       ZOOKEEPER_SERVERS: "zookeeper:22888:23888"
   kafka1:
-    image: confluentinc/cp-enterprise-kafka:3.2.0
+    image: confluentinc/cp-enterprise-kafka:3.3.0
     depends_on:
       - zookeeper
     environment:
@@ -20,36 +20,7 @@ services:
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka1:9092
-      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-  kafka2:
-    image: confluentinc/cp-enterprise-kafka:3.2.0
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_BROKER_RACK: "A2"
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-      KAFKA_DELETE_TOPIC_ENABLE: "true"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka1:9092
-      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-  kafka3:
-    image: confluentinc/cp-enterprise-kafka:3.2.0
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 3
-      KAFKA_BROKER_RACK: "A3"
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-      KAFKA_DELETE_TOPIC_ENABLE: "true"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka1:9092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -61,8 +32,6 @@ services:
     depends_on:
       - zookeeper
       - kafka1
-      - kafka2
-      - kafka3
       - schemaregistry
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka1:9092
@@ -103,8 +72,6 @@ services:
     depends_on:
       - zookeeper
       - kafka1
-      - kafka2
-      - kafka3
     ports:
       - "9021:9021"
     environment:
@@ -114,7 +81,7 @@ services:
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_NAME: "wiki-control-center"
   schemaregistry:
-    image: confluentinc/cp-schema-registry:3.2.0
+    image: confluentinc/cp-schema-registry:3.3.0
     restart: always
     depends_on:
       - zookeeper
@@ -131,17 +98,13 @@ services:
           CHANGESMONITOR_SCHEMA_REGISTRY_URL: "http://schemaregistry:8081"
       depends_on:
           - kafka1
-          - kafka2
-          - kafka3
           - schemaregistry
           - connect
 
   kafka-create-topics:
-    image: confluentinc/cp-enterprise-kafka:3.2.0
+    image: confluentinc/cp-enterprise-kafka:3.3.0
     depends_on:
       - kafka1
-      - kafka2
-      - kafka3
     hostname: kafka-create-topics
     # We defined a dependency on "kafka", but `depends_on` will NOT wait for the
     # dependencies to be "ready" before starting the "kafka-create-topics"
@@ -150,8 +113,6 @@ services:
     # See https://docs.docker.com/compose/startup-order/
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
                        cub kafka-ready -b kafka1:9092 1 60 && \
-                       cub kafka-ready -b kafka2:9092 1 60 && \
-                       cub kafka-ready -b kafka3:9092 1 60 && \
                        kafka-topics --zookeeper zookeeper:2181 --topic wikipedia.raw --create --replication-factor 1 --partitions 6 && \
                        kafka-topics --zookeeper zookeeper:2181 --topic wikipedia.parsed --create --replication-factor 1 --partitions 6 && \
                        exit'"
