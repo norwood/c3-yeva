@@ -14,6 +14,7 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: "A1"
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
@@ -28,6 +29,7 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 2
+      KAFKA_BROKER_RACK: "A2"
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
@@ -42,6 +44,7 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 3
+      KAFKA_BROKER_RACK: "A3"
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
@@ -109,6 +112,7 @@ services:
       CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
       CONTROL_CENTER_CONNECT_CLUSTER: 'connect:8083'
       CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_NAME: "wiki-control-center"
   schemaregistry:
     image: confluentinc/cp-schema-registry:latest
     restart: always
