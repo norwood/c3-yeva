@@ -146,6 +146,8 @@ services:
     # See https://docs.docker.com/compose/startup-order/
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
                        cub kafka-ready -b kafka1:9092 1 60 && \
+                       cub kafka-ready -b kafka2:9092 1 60 && \
+                       cub kafka-ready -b kafka3:9092 1 60 && \
                        kafka-topics --zookeeper zookeeper:2181 --topic wikipedia.raw --create --replication-factor 1 --partitions 6 && \
                        kafka-topics --zookeeper zookeeper:2181 --topic wikipedia.parsed --create --replication-factor 1 --partitions 6 && \
                        exit'"
