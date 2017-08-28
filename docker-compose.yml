@@ -1,7 +1,7 @@
 version: "2"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:3.2.0
     restart: always
     environment:
       ZOOKEEPER_SERVER_ID: 1
@@ -9,7 +9,7 @@ services:
       ZOOKEEPER_TICK_TIME: "2000"
       ZOOKEEPER_SERVERS: "zookeeper:22888:23888"
   kafka1:
-    image: confluentinc/cp-enterprise-kafka:latest
+    image: confluentinc/cp-enterprise-kafka:3.2.0
     depends_on:
       - zookeeper
     environment:
@@ -24,7 +24,7 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
   kafka2:
-    image: confluentinc/cp-enterprise-kafka:latest
+    image: confluentinc/cp-enterprise-kafka:3.2.0
     depends_on:
       - zookeeper
     environment:
@@ -39,7 +39,7 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
   kafka3:
-    image: confluentinc/cp-enterprise-kafka:latest
+    image: confluentinc/cp-enterprise-kafka:3.2.0
     depends_on:
       - zookeeper
     environment:
@@ -98,7 +98,7 @@ services:
     ports:
       - "5601:5601"
   control_center:
-    image: confluentinc/cp-enterprise-control-center:latest
+    image: confluentinc/cp-enterprise-control-center:3.2.0
     restart: always
     depends_on:
       - zookeeper
@@ -114,7 +114,7 @@ services:
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_NAME: "wiki-control-center"
   schemaregistry:
-    image: confluentinc/cp-schema-registry:latest
+    image: confluentinc/cp-schema-registry:3.2.0
     restart: always
     depends_on:
       - zookeeper
@@ -137,7 +137,7 @@ services:
           - connect
 
   kafka-create-topics:
-    image: confluentinc/cp-enterprise-kafka:latest
+    image: confluentinc/cp-enterprise-kafka:3.2.0
     depends_on:
       - kafka1
       - kafka2
